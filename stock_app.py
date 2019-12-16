@@ -77,7 +77,7 @@ df.plot(x='date',y=['high', 'open'])
 plt.show()
 
 
-print(df.head())
+print(df)
 
 
 
