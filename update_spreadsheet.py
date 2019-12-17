@@ -25,6 +25,9 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name('chave_api.json',
 
 gc = gspread.authorize(credentials)
 
+URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/1LEM6gSrcDPtZSd3j6qjCBTDjEnciGVCAFI3FHH0coiQ/edit#gid=0'
+
+
 planilha = gc.open_by_url(URL_PLANILHA)
 
 PLANILHA_STATUS_ATUAL = planilha.worksheet("status_atual")
@@ -57,7 +60,7 @@ def altera_ticker(p_ticker):
 
 RELACAO_TICKERS = planilha.worksheet("tickers")
 rel_tickers = RELACAO_TICKERS.col_values(1)
-rel_tickers = values_list[1:]
+rel_tickers = rel_tickers[1:]
 print('Relação de tickers: '+ str(rel_tickers))
 
 
@@ -69,6 +72,24 @@ for ticker in rel_tickers:
 
 
 
+#TRATA OS VALORES DA TABELA RECEBIDA
+for tb_values in range(0, len(tot_vals), len(table_titulos)):
+    c_Date.append(trata_date(re.sub(r'\<.*\>', '', str(re.sub(r'.*<td.*\">', '', str(tot_vals[tb_values]))))))
+    c_Open.append(float(re.sub(r'\<.*\>', '', str(re.sub(r'.*<td.*\">', '', str(tot_vals[tb_values+1])))).replace(',','.')))
+    c_High.append(float(re.sub(r'\<.*\>', '', str(re.sub(r'.*<td.*\">', '', str(tot_vals[tb_values+2])))).replace(',','.')))
+    c_Low.append(float(re.sub(r'\<.*\>', '', str(re.sub(r'.*<td.*\">', '', str(tot_vals[tb_values+3])))).replace(',','.')))
+    c_Close.append(float(re.sub(r'\<.*\>', '', str(re.sub(r'.*<td.*\">', '', str(tot_vals[tb_values+4])))).replace(',','.')))
+    c_Volume.append(float(re.sub(r'\<.*\>', '', str(re.sub(r'.*<td.*\">', '', str(tot_vals[tb_values+5])))).replace(',','.')))
+
+
+df = pd.DataFrame({
+    'date':c_Date,
+    'open':c_Open,
+    'high':c_High,
+    'low':c_Low,
+    'close':c_Close,
+    'volume':c_Volume
+})
 
 
 
